@@ -65,7 +65,7 @@ SERVER
 
 **_CHECKLIST_**
 -> Make sure you have 3 package.json files (global, server, client)
--> Install respective dependencies inside each
+-> Install respective dependencies inside each package.json
 -> global - concurrently
 -> client - react-router-dom, typescript, @types/
 -> server - mongoose express cors dotenv nodemon
@@ -75,5 +75,18 @@ npm run dev in server/ = hot‑reloading Express (+ Mongoose soon).
 npm run dev in client/ = Vite React dev server with proxy.
 npm run dev at the root (with the scripts above) runs both.
 
-10/ CONNECT OPENAI
--> npm install openai
+**_GitHub Workflow_**
+
+1/ Clone the main branch of the repo
+-> git clone https://github.com/The-Axolotl-Group/mars
+2/ Navigate to the main directory of the repo
+3/ Create new feature branch
+-> git switch -c marek/backend
+
+2/ Double check the branch was created and that you're in that branch
+-> git status
+-> git branch
+
+3/ git add .
+4/ git commit -m "Test commit"
+5/ git push origin marek/backend
