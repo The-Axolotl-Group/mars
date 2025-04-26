@@ -1,0 +1,25 @@
+{
+  "name": "mars",
+  "version": "1.0.0",
+  "description": "Space. It’s really cool.  Have you ever wondered what life is like on a foreign planet or celestial object? Wonder no more, with science, mystery is just a memory!",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "concurrently -k \"npm run dev --prefix server\" \"npm run dev --prefix client\"",
+    "build": "npm run build --prefix server && npm run build --prefix client"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/The-Axolotl-Group/mars.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/The-Axolotl-Group/mars/issues"
+  },
+  "homepage": "https://github.com/The-Axolotl-Group/mars#readme",
+  "dependencies": {
+    "concurrently": "^9.1.2"
+  }
+}
