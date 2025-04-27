@@ -9,6 +9,7 @@ import PictureOfTheDay from './components/PictureOfTheDay.tsx';
 import SecondTextSection from './components/SecondTextSection.tsx';
 import Footer from './components/Footer.tsx';
 
+
 function App() {
   const [scrollTop, setScrollTop] = useState(0);
 
