@@ -18,7 +18,7 @@ app.use(express.urlencoded());
 app.use(cors());
 app.use(express.static(path.resolve(__dirname, '../client')));
 
-app.use('/api', apiRouter(client));
+app.use('/api', apiRouter);
 
 app.get('/', (req: Request, res: Response) => {
   res.status(200).send('API is working...');
