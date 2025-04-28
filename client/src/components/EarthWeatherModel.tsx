@@ -10,7 +10,7 @@ function MarsModel(props: MarsModelProps) {
   // console.log(props);
   const { scene: originalScene } = useGLTF('/Planet_Earth.glb');
   const clonedScene = originalScene.clone(true);
-  clonedScene.scale.setScalar(0.065);
+  clonedScene.scale.setScalar(0.06);
   const groupRef = useRef<THREE.Group>(null);
 
   useFrame(() => {
@@ -31,7 +31,7 @@ export default function MarsGlobe() {
   return (
     <Canvas
       className='canvas'
-      style={{ width: '300px', height: '1000px' }}
+      style={{ width: '600px', height: '1000px' }}
       camera={{ position: [0, 0, 80], fov: 45 }}
     >
       <color attach='background' args={['#000']} /> {/* black bg looks nicer */}
