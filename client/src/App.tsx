@@ -8,10 +8,11 @@ import MarsGallery from './components/MarsGallery.tsx';
 import PictureOfTheDay from './components/PictureOfTheDay.tsx';
 import SecondTextSection from './components/SecondTextSection.tsx';
 import Footer from './components/Footer.tsx';
-
+import { usePodData } from './fetch/fetch.tsx';
 
 function App() {
   const [scrollTop, setScrollTop] = useState(0);
+  const { podData } = usePodData();
 
   // this useEffect make scroll down smooth
   useEffect(() => {
@@ -32,6 +33,7 @@ function App() {
     };
   }, []);
 
+  // get the scroll down date by browser (px)
   useEffect(() => {
     const handleScroll = () => {
       setScrollTop(window.scrollY);
@@ -43,6 +45,9 @@ function App() {
       window.removeEventListener('scroll', handleScroll);
     };
   }, []);
+
+  if (!podData) return <div>Loading POD data...</div>;
+
   return (
     <>
       <h1 className='test-scrollTop'>{scrollTop}</h1>
@@ -55,7 +60,7 @@ function App() {
       <Weather scrollTop={scrollTop} />
       <MarsGallery />
       <SecondTextSection />
-      <PictureOfTheDay />
+      <PictureOfTheDay podData={podData} />
       <Footer />
     </>
   );
