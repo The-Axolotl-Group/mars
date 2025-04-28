@@ -1,6 +1,6 @@
 const Hero = () => {
   return (
-    <div className='hero-container'>
+    <div id='hero' className='hero-container'>
       <h1 className='section-title'>
         Discover Mars: Where Exploration Meets Reality
       </h1>
