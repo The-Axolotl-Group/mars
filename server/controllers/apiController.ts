@@ -57,8 +57,22 @@ const apiController = {
        */
 
     try {
+      /* 
+      We can also get weather by:
+      - City
+      - State code
+      - Country code
+      https://api.openweathermap.org/data/2.5/weather?q={city name},{state code},{country code}&appid={API key}
+      */
+      const EARTH_URL =
+        OPENWEATHER_URL +
+        `lat=${lat}&lon=${lon}&appid=${OPENWEATHER_API_KEY}&units=metric`;
+      // console.log('### EARTH_URL ###');
+      // console.log(EARTH_URL);
+
       const response = await fetch(
-        OPENWEATHER_URL + `lat=${lat}&lon=${lon}&appid=${OPENWEATHER_API_KEY}`
+        OPENWEATHER_URL +
+          `lat=${lat}&lon=${lon}&appid=${OPENWEATHER_API_KEY}&units=metric`
       );
       if (!response.ok) {
         throw new Error(`Response status: ${response.status}`);
@@ -67,21 +81,28 @@ const apiController = {
       if (!res.locals.weatherData) res.locals.weatherData = {};
 
       const randomDay = data.daily[0];
-      console.log(randomDay.dt);
-      console.log(randomDay.temp.day);
+      const date = new Date(randomDay.dt * 1000);
 
+      const pad = (n: number) => n.toString().padStart(2, '0');
+      const mm = pad(date.getMonth() + 1);
+      const dd = pad(date.getDate());
+      const yyyy = date.getFullYear();
+
+      const mmddyyyy = `${mm}/${dd}/${yyyy}`; // "04/27/2025"
+
+      // Metrics interpretation - https://openweathermap.org/current
       res.locals.weatherData.earth = {
-        date: randomDay.dt,
-        temp_avg: randomDay.temp.day, // <---
-        temp_min: randomDay.temp.min, // <---
-        temp_max: randomDay.temp.max, // <---
-        pressure: randomDay.pressure, // <---
-        wind_speed: randomDay.wind_speed, // <---
-        humidity: randomDay.humidity,
+        date: mmddyyyy,
+        temp_avg: `${randomDay.temp.day} °C`, // <---
+        temp_min: `${randomDay.temp.min} °C`, // <---
+        temp_max: `${randomDay.temp.max} °C`, // <---
+        pressure: `${randomDay.pressure * 100} Pa`, // convert hPa to Pa
+        wind_speed: `${randomDay.wind_speed} m/s`, // <---
+        humidity: `${randomDay.humidity} %`,
       };
 
-      console.log('### EARTH DATA ###');
-      console.log(res.locals.weatherData.earth);
+      // console.log('### EARTH DATA ###');
+      // console.log(res.locals.weatherData.earth);
       return next();
     } catch (err) {
       return next({
@@ -101,36 +122,47 @@ const apiController = {
     next: NextFunction
   ): Promise<void> => {
     /* !!! 
-    
     1/ Implement logic where we look up the data inside our database
     - If we can find it, retrieve form the data base.
     - If we canNOT find it, run the fetch call and SAVE the data as to avoid repeated DB fetches.
 
-    2/ Let the user select the SOL
+    2/ Let the user select the SOL -> 
+    - 675, 676, 677, 678, 679, 680, 681
     */
 
     const FINAL_URL = `${NASA_URL}&feedtype=json&ver=1.0`;
-    console.log(FINAL_URL);
+    // console.log('### MARS URL ###');
+    // console.log(FINAL_URL);
 
     try {
       const response = await fetch(FINAL_URL);
-      console.log(FINAL_URL);
       if (!response.ok) {
         throw new Error(`Response status: ${response.status}`);
       }
       const data = await response.json();
       const sols = data.sol_keys;
-      console.log(sols);
-      const lastSol = sols[sols.length - 1];
+
+      /* Fetch daata for each SOL
+      1/ Loop through each sol
+      2/ Look up the desired data for each sol
+      3/ Store the desired data for each sol
+      */
       if (!res.locals.weatherData) res.locals.weatherData = {};
-      res.locals.weatherData.mars = {
-        sol: lastSol,
-        temperature_avg: lastSol.AT.av,
-        temperature_min: lastSol.AT.mn,
-        temperature_max: lastSol.AT.mx,
-        wind_speed: lastSol.HWS.av,
-        pressue: lastSol.PRE.av,
-      };
+      res.locals.weatherData.mars = [];
+
+      for (const sol of sols) {
+        const solData = data[sol];
+        res.locals.weatherData.mars.push({
+          sol: sol,
+          temp_avg: `${solData.AT.av} °C`, // Degrees Celsius
+          temp_min: `${solData.AT.mn} °C`, // Degrees Celsius
+          temp_max: `${solData.AT.mx} °C`, // Degrees Celsius
+          pressure: `${solData.PRE.av} Pa`, // Pascals
+          wind_speed: `${solData.HWS.av} m/s`, // meters / sec
+        });
+      }
+      // console.log('### MARS DATA ###');
+      // console.log(res.locals.weatherData.mars);
 
       /* DATA CATALOG: https://api.nasa.gov/assets/insight/InSight%20Weather%20API%20Documentation.pdf
         "675": {
@@ -155,8 +187,6 @@ const apiController = {
         },
    */
 
-      console.log('### MARS DATA ###');
-      console.log(res.locals.weatherData);
       return next();
     } catch (err) {
       return next({
@@ -177,8 +207,15 @@ const apiController = {
       // !!! Make date dynamic
       const { lat, lon } = req.query;
       const FINAL_URL = `https://api.nasa.gov/planetary/earth/imagery?lat=${lat}&lon=${lon}&date=2024-01-01&cloud_score=true&dim=0.3&api_key=${NASA_API_KEY}`;
-      console.log(FINAL_URL);
+      // console.log('### IMAGE OF EARTH ###');
+      // console.log(FINAL_URL);
+
+      // !!! THIS API CALL RETURNS AN IMAGE, NOT DATA
       const response = await fetch(FINAL_URL);
+      if (!response.ok) {
+        throw new Error(`Response status: ${response.status}`);
+      }
+
       const data = await response.json();
 
       if (!res.locals.weatherData) res.locals.weatherData = {};
@@ -208,11 +245,67 @@ const apiController = {
 
       const data = await response.json();
       res.locals.pod = data;
-      console.log(res.locals.pod);
+      // console.log(res.locals.pod);
       return next();
     } catch (err) {
       return next({
         log: `fetchPod data Error: ${err}`,
+        status: 500,
+        message: { error: 'An error occurred' },
+      });
+    }
+  },
+
+  fetchRandomPics: async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
+    try {
+      const sol = 3996;
+      const RANDOM_PICS_URL = `https://api.nasa.gov/mars-photos/api/v1/rovers/curiosity/photos?sol=${sol}&api_key=${NASA_API_KEY}`;
+
+      const response = await fetch(RANDOM_PICS_URL);
+      if (!response.ok) {
+        throw new Error(`Response status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      const photos = data.photos;
+
+      if (!res.locals.randomMarsPics) res.locals.randomMarsPics = [];
+
+      // Define number of images you want to pass to the frontend
+      let numberOfPhotos: number = 99;
+
+      for (let i = 0; i < numberOfPhotos; i++) {
+        const currPhoto = photos[i];
+
+        res.locals.randomMarsPics.push({
+          nasa_id: currPhoto.id,
+          sol: currPhoto.sol,
+          img_src: currPhoto.img_src,
+          earth_date: currPhoto.earth_date,
+        });
+      }
+      // console.log(res.locals.randomMarsPics);
+
+      return next();
+    } catch (err) {
+      return next({
+        log: `fetchRandomPics data Error: ${err}`,
+        status: 500,
+        message: { error: 'An error occurred' },
+      });
+    }
+  },
+
+  getResponse: async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      return next();
+    } catch (err) {
+      return next({
+        log: `getResponse data Error: ${err}`,
         status: 500,
         message: { error: 'An error occurred' },
       });

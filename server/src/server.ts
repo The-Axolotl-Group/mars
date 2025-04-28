@@ -3,11 +3,15 @@ import express, { ErrorRequestHandler, Request, Response } from 'express';
 import path from 'path';
 import apiRouter from '../routes/api';
 import cors from 'cors';
+import OpenAI from 'openai';
 
 dotenv.config();
 
 const PORT = process.env.PORT || 3000;
 const app = express();
+
+// OpenAI auth: https://github.com/openai/openai-node
+const client = new OpenAI({ apiKey: process.env['OPENAI_KEY'] });
 
 app.use(express.json());
 app.use(express.urlencoded());
