@@ -67,8 +67,8 @@ const apiController = {
       const EARTH_URL =
         OPENWEATHER_URL +
         `lat=${lat}&lon=${lon}&appid=${OPENWEATHER_API_KEY}&units=metric`;
-      console.log('### EARTH_URL ###');
-      console.log(EARTH_URL);
+      // console.log('### EARTH_URL ###');
+      // console.log(EARTH_URL);
 
       const response = await fetch(
         OPENWEATHER_URL +
@@ -101,8 +101,8 @@ const apiController = {
         humidity: `${randomDay.humidity} %`,
       };
 
-      console.log('### EARTH DATA ###');
-      console.log(res.locals.weatherData.earth);
+      // console.log('### EARTH DATA ###');
+      // console.log(res.locals.weatherData.earth);
       return next();
     } catch (err) {
       return next({
@@ -154,30 +154,15 @@ const apiController = {
         const solData = data[sol];
         res.locals.weatherData.mars.push({
           sol: sol,
-          temperature_avg: `${solData.AT.av} °C`, // Degrees Celsius
-          temperature_min: `${solData.AT.mn} °C`, // Degrees Celsius
-          temperature_max: `${solData.AT.mx} °C`, // Degrees Celsius
+          temp_avg: `${solData.AT.av} °C`, // Degrees Celsius
+          temp_min: `${solData.AT.mn} °C`, // Degrees Celsius
+          temp_max: `${solData.AT.mx} °C`, // Degrees Celsius
           pressure: `${solData.PRE.av} Pa`, // Pascals
           wind_speed: `${solData.HWS.av} m/s`, // meters / sec
         });
       }
-
-      // // A single sol
-      // if (!res.locals.weatherData) res.locals.weatherData = {};
-      // const lastSol = sols[sols.length - 1];
-      // const lastSolData = data[lastSol];
-
-      // res.locals.weatherData.mars = {
-      //   sol: lastSol,
-      //   temperature_avg: `${lastSolData.AT.av} °C`, // Degrees Celsius
-      //   temperature_min: `${lastSolData.AT.mn} °C`, // Degrees Celsius
-      //   temperature_max: `${lastSolData.AT.mx} °C`, // Degrees Celsius
-      //   pressure: `${lastSolData.PRE.av} Pa`, // Pascals
-      //   wind_speed: `${lastSolData.HWS.av} m/s`, // meters / sec
-      // };
-
-      console.log('### MARS DATA ###');
-      console.log(res.locals.weatherData.mars);
+      // console.log('### MARS DATA ###');
+      // console.log(res.locals.weatherData.mars);
 
       /* DATA CATALOG: https://api.nasa.gov/assets/insight/InSight%20Weather%20API%20Documentation.pdf
         "675": {
@@ -222,8 +207,8 @@ const apiController = {
       // !!! Make date dynamic
       const { lat, lon } = req.query;
       const FINAL_URL = `https://api.nasa.gov/planetary/earth/imagery?lat=${lat}&lon=${lon}&date=2024-01-01&cloud_score=true&dim=0.3&api_key=${NASA_API_KEY}`;
-      console.log('### IMAGE OF EARTH ###');
-      console.log(FINAL_URL);
+      // console.log('### IMAGE OF EARTH ###');
+      // console.log(FINAL_URL);
 
       // !!! THIS API CALL RETURNS AN IMAGE, NOT DATA
       const response = await fetch(FINAL_URL);
@@ -260,7 +245,7 @@ const apiController = {
 
       const data = await response.json();
       res.locals.pod = data;
-      console.log(res.locals.pod);
+      // console.log(res.locals.pod);
       return next();
     } catch (err) {
       return next({
@@ -277,10 +262,50 @@ const apiController = {
     next: NextFunction
   ): Promise<void> => {
     try {
+      const sol = 3996;
+      const RANDOM_PICS_URL = `https://api.nasa.gov/mars-photos/api/v1/rovers/curiosity/photos?sol=${sol}&api_key=${NASA_API_KEY}`;
+
+      const response = await fetch(RANDOM_PICS_URL);
+      if (!response.ok) {
+        throw new Error(`Response status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      const photos = data.photos;
+
+      if (!res.locals.randomMarsPics) res.locals.randomMarsPics = [];
+
+      // Define number of images you want to pass to the frontend
+      let numberOfPhotos: number = 99;
+
+      for (let i = 0; i < numberOfPhotos; i++) {
+        const currPhoto = photos[i];
+
+        res.locals.randomMarsPics.push({
+          nasa_id: currPhoto.id,
+          sol: currPhoto.sol,
+          img_src: currPhoto.img_src,
+          earth_date: currPhoto.earth_date,
+        });
+      }
+      // console.log(res.locals.randomMarsPics);
+
       return next();
     } catch (err) {
       return next({
         log: `fetchRandomPics data Error: ${err}`,
+        status: 500,
+        message: { error: 'An error occurred' },
+      });
+    }
+  },
+
+  getResponse: async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      return next();
+    } catch (err) {
+      return next({
+        log: `getResponse data Error: ${err}`,
         status: 500,
         message: { error: 'An error occurred' },
       });
