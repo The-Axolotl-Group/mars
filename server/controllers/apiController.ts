@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
+import OpenAI from 'openai';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -300,7 +301,12 @@ const apiController = {
     }
   },
 
-  getResponse: async (req: Request, res: Response, next: NextFunction) => {
+  getResponse: async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+    client: OpenAI
+  ): Promise<void> => {
     try {
       return next();
     } catch (err) {
