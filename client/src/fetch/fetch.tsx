@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 
 
 // custom hook for comparison data
-export const useComparisonData = () => {
+export const useComparisonData = (latitude: number, longitude: number) => {
     // comparison data useState
     const [comparisonData, setComparisonData] = useState<any>(null);
     const [comparisonDataError, setcomparisonDataError] = useState<string | null>(null);
@@ -11,8 +11,14 @@ export const useComparisonData = () => {
     useEffect (() => {
         // fetch request for comparison data
         const fetchcomparisonData = async () => { 
+
+            if (!latitude || !longitude) {
+                setcomparisonDataError('Missing Latitude/Longitude');
+                return;
+            }
+
             try {
-                const response = await fetch('http://localhost:3000/api/comparisonData');
+                const response = await fetch(`http://localhost:3000/api/comparisonData?lat=${latitude}&lon=${longitude}`);
 
             if(!response.ok) throw new Error('Network response not ok');
             
@@ -26,7 +32,7 @@ export const useComparisonData = () => {
         };
 
         fetchcomparisonData();
-    }, []);
+    }, [latitude, longitude]);
 
     return { comparisonData, comparisonDataError };
 };
@@ -62,3 +68,33 @@ export const usePodData = () => {
 
     return { podData, podDataError };
 };    
+
+
+export const useRandomPics = () => {
+    // pod useState
+    const [RandomPics, setRandomPics] = useState<any>(null);
+    const [RandomPicsError, setRandomPicsError] = useState<string | null>(null);
+
+    useEffect (() => {
+        // fetch request for comparison data
+        const fetchcomparisonData = async () => { 
+
+            try {
+                const response = await fetch('http://localhost:3000/api/randomPics');
+
+            if(!response.ok) throw new Error('Network response not ok');
+            
+            const data = await response.json();
+            setRandomPics(data);
+
+            } catch (err) {
+                if (err instanceof Error) setRandomPicsError(err.message); 
+                else setRandomPicsError('An error occurred in fetchcomparisonData');
+            }
+        };
+
+        fetchcomparisonData();
+    }, []);
+
+    return { RandomPics, RandomPicsError };
+};
