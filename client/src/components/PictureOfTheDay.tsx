@@ -12,18 +12,12 @@ type PodData = {
 };
 type PictureOfTheDayProps = {
   podData: PodData;
+  scrollTop: number;
 };
 
 const PictureOfTheDay = ({
-  podData: {
-    date,
-    explanation,
-    hdurl,
-    // media_type,
-    // service_version,
-    title,
-    url,
-  },
+  podData: { date, explanation, hdurl, title, url },
+  scrollTop,
 }: PictureOfTheDayProps) => {
   const [showBigImg, setShowBIgImg] = useState(false);
   const handleBigImg = () => {
@@ -31,13 +25,21 @@ const PictureOfTheDay = ({
   };
   return (
     <div id='pod' className='pod-container'>
-      <div className='pod-left'>
+      <div
+        className={`pod-left  ${
+          scrollTop < 5300 || scrollTop > 6300 ? 'hide-left-100' : ''
+        }`}
+      >
         <h1 className='content-text-title'>Picture of the day</h1>
         <p className='content-text-sub-title'>{title}</p>
         <p className='content-text'>{date}</p>
         <p className='content-text'>{explanation}</p>
       </div>
-      <div className='pod-right'>
+      <div
+        className={`pod-right ${
+          scrollTop < 5300 || scrollTop > 6300 ? 'hide-right-100' : ''
+        }`}
+      >
         {/* <img className='pod-img' src={hdurl} alt='' /> */}
         <img
           onClick={() => handleBigImg()}

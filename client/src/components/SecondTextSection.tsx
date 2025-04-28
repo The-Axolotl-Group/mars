@@ -2,11 +2,11 @@ const SecondTextSection = () => {
   return (
     <div className='section-container'>
       <h1 className='section-title'>
-        Section Text: Where Exploration Meets Reality
+        Captured by Curiosity: A Gallery from the Martian Surface
       </h1>
       <h2 className='section-sub-title'>
-        Experience interactive 3D models, compare planetary environments, and
-        witness the stunning beauty of the Red Planet.
+        Browse stunning images taken by Mars rovers, revealing alien landscapes
+        and breathtaking vistas.
       </h2>
     </div>
   );

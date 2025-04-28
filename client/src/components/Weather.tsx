@@ -2,76 +2,126 @@ import { useState } from 'react';
 import MarsWeatherModel from './MarsWeatherModel';
 import EarthWeatherModel from './EarthWeatherModel';
 
-type WeatherProps = {
-  scrollTop: number;
+type EarthData = {
+  date: string;
+  humidity: string;
+  pressure: string;
+  temp_avg: string;
+  temp_max: string;
+  temp_min: string;
+  wind_speed: string;
 };
 
-// Full Mars weather data
-const marsData = [
-  {
-    sol: '675',
-    temperature_avg: '-62.314',
-    temperature_min: '-96.872',
-    temperature_max: '-15.908',
-    pressure: '750.563',
-    wind_speed: '7.233',
-  },
-  {
-    sol: '676',
-    temperature_avg: '-62.812',
-    temperature_min: '-96.912',
-    temperature_max: '-16.499',
-    pressure: '749.09',
-    wind_speed: '8.526',
-  },
-  {
-    sol: '677',
-    temperature_avg: '-63.056',
-    temperature_min: '-97.249',
-    temperature_max: '-16.853',
-    pressure: '748.698',
-    wind_speed: '7.887',
-  },
-  {
-    sol: '678',
-    temperature_avg: '-62.562',
-    temperature_min: '-97.728',
-    temperature_max: '-9.055',
-    pressure: '743.741',
-    wind_speed: '5.246',
-  },
-  {
-    sol: '679',
-    temperature_avg: '-62.551',
-    temperature_min: '-96.644',
-    temperature_max: '-11.561',
-    pressure: '744.529',
-    wind_speed: '5.565',
-  },
-  {
-    sol: '680',
-    temperature_avg: '-61.789',
-    temperature_min: '-96.811',
-    temperature_max: '-15.298',
-    pressure: '743.99',
-    wind_speed: '6.517',
-  },
-  {
-    sol: '681',
-    temperature_avg: '-62.434',
-    temperature_min: '-95.447',
-    temperature_max: '-4.444',
-    pressure: '743.55',
-    wind_speed: '5.632',
-  },
+type MarsDayData = {
+  sol: string;
+  temp_avg: string;
+  temp_min: string;
+  temp_max: string;
+  pressure: string;
+  wind_speed: string;
+  humidity: string;
+};
+type City = {
+  name: string;
+  lat: number;
+  lon: number;
+};
+
+type ComparisonData = {
+  earth: EarthData;
+  mars: MarsDayData[];
+};
+
+type WeatherProps = {
+  scrollTop: number;
+  comparisonData: ComparisonData;
+  setCoords: (coords: { lat: number; lon: number }) => void;
+};
+const cities: City[] = [
+  { name: 'New York', lat: 40.7128, lon: -74.006 },
+  { name: 'San Francisco', lat: 37.7749, lon: -122.4194 },
+  { name: 'Los Angeles', lat: 34.0522, lon: -118.2437 },
+  { name: 'Prague', lat: 50.0755, lon: 14.4378 },
+  { name: 'Beijing', lat: 39.9042, lon: 116.4074 },
+  { name: 'London', lat: 51.5072, lon: -0.1276 },
+  { name: 'Paris', lat: 48.8566, lon: 2.3522 },
+  { name: 'Dubai', lat: 25.2048, lon: 55.2708 },
+  { name: 'Sydney', lat: -33.8688, lon: 151.2093 },
 ];
 
-const Weather = ({ scrollTop }: WeatherProps) => {
+// Full Mars weather data
+// const marsData = [
+//   {
+//     sol: '675',
+//     temperature_avg: '-62.314',
+//     temperature_min: '-96.872',
+//     temperature_max: '-15.908',
+//     pressure: '750.563',
+//     wind_speed: '7.233',
+//   },
+//   {
+//     sol: '676',
+//     temperature_avg: '-62.812',
+//     temperature_min: '-96.912',
+//     temperature_max: '-16.499',
+//     pressure: '749.09',
+//     wind_speed: '8.526',
+//   },
+//   {
+//     sol: '677',
+//     temperature_avg: '-63.056',
+//     temperature_min: '-97.249',
+//     temperature_max: '-16.853',
+//     pressure: '748.698',
+//     wind_speed: '7.887',
+//   },
+//   {
+//     sol: '678',
+//     temperature_avg: '-62.562',
+//     temperature_min: '-97.728',
+//     temperature_max: '-9.055',
+//     pressure: '743.741',
+//     wind_speed: '5.246',
+//   },
+//   {
+//     sol: '679',
+//     temperature_avg: '-62.551',
+//     temperature_min: '-96.644',
+//     temperature_max: '-11.561',
+//     pressure: '744.529',
+//     wind_speed: '5.565',
+//   },
+//   {
+//     sol: '680',
+//     temperature_avg: '-61.789',
+//     temperature_min: '-96.811',
+//     temperature_max: '-15.298',
+//     pressure: '743.99',
+//     wind_speed: '6.517',
+//   },
+//   {
+//     sol: '681',
+//     temperature_avg: '-62.434',
+//     temperature_min: '-95.447',
+//     temperature_max: '-4.444',
+//     pressure: '743.55',
+//     wind_speed: '5.632',
+//   },
+// ];
+
+const Weather: React.FC<WeatherProps> = ({
+  scrollTop,
+  comparisonData,
+  setCoords,
+}) => {
   // Store the currently selected Mars sol
   const [selectedSol, setSelectedSol] = useState('675');
+  // console.log(comparisonData);
 
   // Find the Mars weather data corresponding to the selected sol
-  const currentMarsData = marsData.find((data) => data.sol === selectedSol);
+  const currentMarsData = comparisonData.mars.find(
+    (data) => data.sol === selectedSol
+  );
 
   return (
     <div id='weather' className='weather-container'>
@@ -111,18 +161,18 @@ const Weather = ({ scrollTop }: WeatherProps) => {
                     onChange={(e) => setSelectedSol(e.target.value)}
                     className='sol-dropdown'
                   >
-                    {marsData.map((data) => (
+                    {comparisonData.mars.map((data) => (
                       <option key={data.sol} value={data.sol}>
                         Sol {data.sol}
                       </option>
                     ))}
                   </select>
                 </li>
-                <li>Avg Temp: {currentMarsData.temperature_avg} °C</li>
-                <li>Max Temp: {currentMarsData.temperature_max} °C</li>
-                <li>Min Temp: {currentMarsData.temperature_min} °C</li>
-                <li>Wind Speed: {currentMarsData.wind_speed} m/s</li>
-                <li>Pressure: {currentMarsData.pressure} Pa</li>
+                <li>Avg Temp: {currentMarsData.temp_avg}</li>
+                <li>Max Temp: {currentMarsData.temp_max}</li>
+                <li>Min Temp: {currentMarsData.temp_min}</li>
+                <li>Wind Speed: {currentMarsData.wind_speed}</li>
+                <li>Pressure: {currentMarsData.pressure}</li>
               </ul>
             )}
           </div>
@@ -133,14 +183,40 @@ const Weather = ({ scrollTop }: WeatherProps) => {
             }`}
           >
             <h2>Earth</h2>
+
+            {/* Citys Selector */}
             <ul>
-              <li>Date: 04/27/2025</li>
-              <li>Avg Temp: 27.18 °C</li>
-              <li>Max Temp: 28.39 °C</li>
-              <li>Min Temp: 18.25 °C</li>
-              <li>Wind Speed: 4.34 m/s</li>
-              <li>Pressure: 101800 Pa</li>
-              <li>Humidity: 56%</li>
+              <li>
+                City:{' '}
+                <select
+                  className='sol-dropdown'
+                  onChange={(e) => {
+                    const selectedCity = cities.find(
+                      (city) => city.name === e.target.value
+                    );
+                    if (selectedCity) {
+                      setCoords({
+                        lat: selectedCity.lat,
+                        lon: selectedCity.lon,
+                      });
+                    }
+                  }}
+                >
+                  {cities.map((city) => (
+                    <option key={city.name} value={city.name}>
+                      {city.name}
+                    </option>
+                  ))}
+                </select>
+              </li>
+
+              <li>Date: {comparisonData.earth.date}</li>
+              <li>Avg Temp: {comparisonData.earth.temp_avg}</li>
+              <li>Max Temp: {comparisonData.earth.temp_max}</li>
+              <li>Min Temp: {comparisonData.earth.temp_min}</li>
+              <li>Wind Speed: {comparisonData.earth.wind_speed}</li>
+              <li>Pressure: {comparisonData.earth.pressure}</li>
+              <li>Humidity: {comparisonData.earth.humidity}</li>
             </ul>
           </div>
         </section>

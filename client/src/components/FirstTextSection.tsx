@@ -2,11 +2,11 @@ const FirstTextSection = () => {
   return (
     <div className='section-container'>
       <h1 className='section-title'>
-        Section Text: Where Exploration Meets Reality
+        Two Worlds, One Comparison: Mars vs Earth
       </h1>
       <h2 className='section-sub-title'>
-        Experience interactive 3D models, compare planetary environments, and
-        witness the stunning beauty of the Red Planet.
+        Discover how temperatures, winds, and atmospheres differ between our
+        home and the Red Planet.
       </h2>
     </div>
   );

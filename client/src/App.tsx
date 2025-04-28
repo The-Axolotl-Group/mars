@@ -7,19 +7,21 @@ import Weather from './components/Weather.tsx';
 import MarsGallery from './components/MarsGallery.tsx';
 import PictureOfTheDay from './components/PictureOfTheDay.tsx';
 import SecondTextSection from './components/SecondTextSection.tsx';
+import ThirdTextSection from './components/ThirdTextSection.tsx';
 import Footer from './components/Footer.tsx';
 import {
   usePodData,
   useRandomPics,
   useComparisonData,
 } from './fetch/fetch.tsx';
+import Navbar from './components/Navbar.tsx';
 
 function App() {
+  const [coords, setCoords] = useState({ lat: 40.7128, lon: -74.006 });
   const [scrollTop, setScrollTop] = useState(0);
   const { podData } = usePodData();
-  // const { comparisonData,comparisonDataError } = useComparisonData(80,37);
-  // const { RandomPics } = useRandomPics();
-
+  const { RandomPics } = useRandomPics();
+  const { comparisonData } = useComparisonData(coords.lat, coords.lon);
   // this useEffect make scroll down smooth
   useEffect(() => {
     const lenis = new Lenis({
@@ -53,25 +55,31 @@ function App() {
   }, []);
 
   // useEffect(() => {
-  //   console.log(comparisonData);
-  //   console.log("err",comparisonDataError)
-  // }, [comparisonData]);
+  //   console.log(RandomPics);
+  // }, [RandomPics]);
 
-  if (!podData) return <div>Loading POD data...</div>;
+  if (!podData || !comparisonData || !RandomPics)
+    return <div>Loading data...</div>;
 
   return (
     <>
-      <h1 className='test-scrollTop'>{scrollTop}</h1>
+      {/* <h1 className='test-scrollTop'>{scrollTop}</h1> */}
+      <Navbar scrollTop={scrollTop} />
       <Hero />
       <div className={`mars-canvas-container ${scrollTop > 800 ? 'hide' : ''}`}>
         <MarsGlobe scrollTop={scrollTop} />
         {/* <h1> Canvas here</h1> */}
       </div>
       <FirstTextSection />
-      <Weather scrollTop={scrollTop} />
-      <MarsGallery scrollTop={scrollTop} />
+      <Weather
+        scrollTop={scrollTop}
+        comparisonData={comparisonData}
+        setCoords={setCoords}
+      />
       <SecondTextSection />
-      <PictureOfTheDay podData={podData} />
+      <MarsGallery scrollTop={scrollTop} RandomPics={RandomPics} />
+      <ThirdTextSection />
+      <PictureOfTheDay podData={podData} scrollTop={scrollTop} />
       <Footer />
     </>
   );
