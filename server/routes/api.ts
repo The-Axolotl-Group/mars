@@ -32,16 +32,22 @@ const apiRouter = (client: OpenAI) => {
     '/randomPics',
     apiController.fetchRandomPics,
     (req: Request, res: Response) => {
-      res.status(200).json(res.locals.randomPics);
+      console.log(res.locals.randomMarsPics);
+      res.status(200).json(res.locals.randomMarsPics);
     }
   );
 
   // // 4. TODO: Make an OpenAI API call to talk to the Martian
   // Save the data to the DB
-  router.post('/chat', (req: Request, res: Response, next: NextFunction) => {
-    const prompt = req.body.prompt as string;
-    apiController.getResponse(req, res, next, client);
-  });
+  router.post(
+    '/chat',
+    (req: Request, res: Response, next: NextFunction) => {
+      apiController.getResponse(req, res, next, client);
+    },
+    (req: Request, res: Response) => {
+      res.status(200).json(res.locals.response);
+    }
+  );
 
   return router;
 };
