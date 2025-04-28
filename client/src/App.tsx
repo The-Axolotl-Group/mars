@@ -15,11 +15,11 @@ import {
 } from './fetch/fetch.tsx';
 
 function App() {
+  const [coords, setCoords] = useState({ lat: 40.7128, lon: -74.006 });
   const [scrollTop, setScrollTop] = useState(0);
   const { podData } = usePodData();
-  // const { comparisonData,comparisonDataError } = useComparisonData(80,37);
-  // const { RandomPics } = useRandomPics();
-
+  const { RandomPics } = useRandomPics();
+  const { comparisonData } = useComparisonData(coords.lat, coords.lon);
   // this useEffect make scroll down smooth
   useEffect(() => {
     const lenis = new Lenis({
@@ -52,12 +52,11 @@ function App() {
     };
   }, []);
 
-  // useEffect(() => {
-  //   console.log(comparisonData);
-  //   console.log("err",comparisonDataError)
-  // }, [comparisonData]);
+  useEffect(() => {
+    console.log(RandomPics);
+  }, [RandomPics]);
 
-  if (!podData) return <div>Loading POD data...</div>;
+  if (!podData || !comparisonData) return <div>Loading data...</div>;
 
   return (
     <>
@@ -68,7 +67,11 @@ function App() {
         {/* <h1> Canvas here</h1> */}
       </div>
       <FirstTextSection />
-      <Weather scrollTop={scrollTop} />
+      <Weather
+        scrollTop={scrollTop}
+        comparisonData={comparisonData}
+        setCoords={setCoords}
+      />
       <MarsGallery scrollTop={scrollTop} />
       <SecondTextSection />
       <PictureOfTheDay podData={podData} />
