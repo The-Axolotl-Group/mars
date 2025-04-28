@@ -29,9 +29,8 @@ const PictureOfTheDay = ({
   const handleBigImg = () => {
     setShowBIgImg(!showBigImg);
   };
-  console.log(date);
   return (
-    <div className='pod-container'>
+    <div id='pod' className='pod-container'>
       <div className='pod-left'>
         <h1 className='content-text-title'>Picture of the day</h1>
         <p className='content-text-sub-title'>{title}</p>

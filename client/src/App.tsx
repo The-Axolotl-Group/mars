@@ -8,11 +8,17 @@ import MarsGallery from './components/MarsGallery.tsx';
 import PictureOfTheDay from './components/PictureOfTheDay.tsx';
 import SecondTextSection from './components/SecondTextSection.tsx';
 import Footer from './components/Footer.tsx';
-import { usePodData } from './fetch/fetch.tsx';
+import {
+  usePodData,
+  useRandomPics,
+  useComparisonData,
+} from './fetch/fetch.tsx';
 
 function App() {
   const [scrollTop, setScrollTop] = useState(0);
   const { podData } = usePodData();
+  // const { comparisonData,comparisonDataError } = useComparisonData(80,37);
+  // const { RandomPics } = useRandomPics();
 
   // this useEffect make scroll down smooth
   useEffect(() => {
@@ -46,6 +52,11 @@ function App() {
     };
   }, []);
 
+  // useEffect(() => {
+  //   console.log(comparisonData);
+  //   console.log("err",comparisonDataError)
+  // }, [comparisonData]);
+
   if (!podData) return <div>Loading POD data...</div>;
 
   return (
@@ -58,7 +69,7 @@ function App() {
       </div>
       <FirstTextSection />
       <Weather scrollTop={scrollTop} />
-      <MarsGallery />
+      <MarsGallery scrollTop={scrollTop} />
       <SecondTextSection />
       <PictureOfTheDay podData={podData} />
       <Footer />
