@@ -1,6 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 import OpenAI from 'openai';
 import dotenv from 'dotenv';
+import path from 'path';
+import fs from 'fs';
 
 dotenv.config();
 
@@ -23,6 +25,35 @@ Links:
 - Query URL format: http://localhost:3000/api/fetchEarthData?lat={lat}&lon={lon}
 - Test URL format (for POSTMAN): http://localhost:3000/api/comparisonData?lat=33.44&lon=-94.04
 */
+
+const promptOpenAI = async (prompt: string, client: OpenAI) => {
+  const systemPrompt: string = fs.readFileSync(
+    path.join(__dirname, './systemPrompt.txt'),
+    'utf8'
+  );
+  try {
+    // Learn more here: https://platform.openai.com/docs/api-reference/evals/run-output-item-object
+    const completion = await client.chat.completions.create({
+      model: 'gpt-4.1',
+      messages: [
+        {
+          role: 'system',
+          content: systemPrompt,
+        },
+        {
+          role: 'user',
+          content: prompt,
+        },
+      ],
+      store: true,
+    });
+
+    const response = completion.choices[0].message.content;
+    return response;
+  } catch (err: unknown) {
+    throw new Error(`Error with completion inside promptOpenAI: ${err}`);
+  }
+};
 
 const apiController = {
   getData: async (
@@ -265,7 +296,6 @@ const apiController = {
     try {
       const sol = 3996;
       const RANDOM_PICS_URL = `https://api.nasa.gov/mars-photos/api/v1/rovers/curiosity/photos?sol=${sol}&api_key=${NASA_API_KEY}`;
-
       const response = await fetch(RANDOM_PICS_URL);
       if (!response.ok) {
         throw new Error(`Response status: ${response.status}`);
@@ -289,8 +319,8 @@ const apiController = {
           earth_date: currPhoto.earth_date,
         });
       }
-      // console.log(res.locals.randomMarsPics);
 
+      // console.log(res.locals.randomMarsPics);
       return next();
     } catch (err) {
       return next({
@@ -308,6 +338,10 @@ const apiController = {
     client: OpenAI
   ): Promise<void> => {
     try {
+      const prompt = req.body.prompt;
+      const response = await promptOpenAI(prompt, client);
+      console.log(response);
+      res.locals.response = response;
       return next();
     } catch (err) {
       return next({
