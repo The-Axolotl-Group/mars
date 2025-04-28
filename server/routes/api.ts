@@ -37,11 +37,13 @@ const apiRouter = (client: OpenAI) => {
   );
 
   // // 4. TODO: Make an OpenAI API call to talk to the Martian
-  // // Save the data to the DB
-  // router.get('/stream', (req: Request, res: Response, next: NextFunction) => {
-  //   const prompt = req.query.prompt as string;
-  //   apiController.getResponse(prompt, res, client);
-  // });
+  // Save the data to the DB
+  router.post('/chat', (req: Request, res: Response, next: NextFunction) => {
+    const prompt = req.body.prompt as string;
+    apiController.getResponse(req, res, next, client);
+  });
+
+  return router;
 };
 
 export default apiRouter;

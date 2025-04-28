@@ -14,11 +14,11 @@ const app = express();
 const client = new OpenAI({ apiKey: process.env['OPENAI_KEY'] });
 
 app.use(express.json());
-app.use(express.urlencoded());
+app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 app.use(express.static(path.resolve(__dirname, '../client')));
 
-app.use('/api', apiRouter);
+app.use('/api', apiRouter(client));
 
 app.get('/', (req: Request, res: Response) => {
   res.status(200).send('API is working...');
