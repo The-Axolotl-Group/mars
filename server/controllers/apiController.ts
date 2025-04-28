@@ -3,6 +3,7 @@ import OpenAI from 'openai';
 import dotenv from 'dotenv';
 import path from 'path';
 import fs from 'fs';
+import model from '../models/apiModels';
 
 dotenv.config();
 
@@ -31,6 +32,7 @@ const promptOpenAI = async (prompt: string, client: OpenAI) => {
     path.join(__dirname, './systemPrompt.txt'),
     'utf8'
   );
+
   try {
     // Learn more here: https://platform.openai.com/docs/api-reference/evals/run-output-item-object
     const completion = await client.chat.completions.create({
@@ -277,7 +279,24 @@ const apiController = {
 
       const data = await response.json();
       res.locals.pod = data;
-      // console.log(res.locals.pod);
+
+      // Save Picture of the Day (POD) to the DB
+      const photo = await model.Pod.find({ copyright: data.copyright });
+      if (photo) {
+        res.locals.pod = photo;
+      } else {
+        const newPod = new model.Pod({
+          copyright: data.copyright,
+          date: data.date,
+          explanation: data.explanation,
+          hdurl: data.hdurl,
+          title: data.title,
+        });
+        await newPod.save();
+
+        res.locals.pod = newPod;
+      }
+
       return next();
     } catch (err) {
       return next({
@@ -311,13 +330,20 @@ const apiController = {
 
       for (let i = 0; i < numberOfPhotos; i++) {
         const currPhoto = photos[i];
+        const photo = await model.Photo.findOne({ nasa_id: currPhoto.id });
+        if (photo) {
+          res.locals.randomMarsPics.push(photo);
+        } else {
+          const newPhoto = new model.Photo({
+            nasa_id: currPhoto.id,
+            sol: currPhoto.sol,
+            img_src: currPhoto.img_src,
+            earth_date: currPhoto.earth_date,
+          });
+          await newPhoto.save();
 
-        res.locals.randomMarsPics.push({
-          nasa_id: currPhoto.id,
-          sol: currPhoto.sol,
-          img_src: currPhoto.img_src,
-          earth_date: currPhoto.earth_date,
-        });
+          res.locals.randomMarsPics.push(newPhoto);
+        }
       }
 
       // console.log(res.locals.randomMarsPics);
@@ -342,6 +368,14 @@ const apiController = {
       const response = await promptOpenAI(prompt, client);
       console.log(response);
       res.locals.response = response;
+
+      // Save message to the DB
+      const newMessage = new model.Message({
+        prompt: prompt,
+        response_message: response,
+      });
+      await newMessage.save();
+
       return next();
     } catch (err) {
       return next({

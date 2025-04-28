@@ -4,6 +4,7 @@ import path from 'path';
 import apiRouter from '../routes/api';
 import cors from 'cors';
 import OpenAI from 'openai';
+import '../models/apiModels';
 
 dotenv.config();
 
