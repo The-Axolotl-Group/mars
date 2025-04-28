@@ -20,6 +20,8 @@ body {
   justify-content: center;
   align-items: center;
 }
+
+/* font style */
 .section-container {
   width: 100%;
   height: 600px;
@@ -84,7 +86,58 @@ body {
 .big-img-btn:hover {
   transform: scale(1.2);
 }
+/* Nav bar */
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 60px;
+  background: rgba(255, 255, 255, 0);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid #fff;
+  transition: ease 0.5s;
+  font-family: 'Orbitron', sans-serif;
+}
 
+.navbar-content {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.navbar-left h1 {
+  font-size: 24px;
+  color: white;
+  font-weight: bold;
+  font-family: 'Orbitron', sans-serif;
+}
+
+.navbar-right {
+  display: flex;
+  gap: 20px;
+}
+
+.navbar-right a {
+  color: rgb(172, 172, 172);
+  text-decoration: none;
+  font-size: 16px;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.navbar-right a:hover {
+  color: #ffffff;
+}
+/* Mars model */
 .mars-canvas-container {
   top: 0;
   left: 0;
@@ -200,6 +253,10 @@ body {
 .mars-gallery-title {
   width: 100%;
   text-align: center;
+  position: relative;
+  top: 0;
+  opacity: 1;
+  transition: ease 0.8s;
 }
 .mars-gallery-pictures-container {
   width: 100%;
@@ -236,9 +293,51 @@ body {
   transform: translateY(0);
   opacity: 1;
 }
-.mars-gallery-picture-box img:hover {
+.mars-gallery-picture-box:hover img {
   transform: scale(1.1);
 }
+.random-button {
+  background-color: #000;
+  all: unset;
+  cursor: pointer;
+  width: 180px;
+  height: 40px;
+  border: 1px solid #a2a2a2;
+  color: #a2a2a2;
+  border-radius: 5px;
+  text-align: center;
+  transition: 0.2s;
+}
+.random-button:hover {
+  border: 1px solid #ffffff;
+  color: #ffffff;
+}
+
+.mars-gallery-picture-box {
+  position: relative;
+  overflow: hidden;
+}
+
+.image-info-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.mars-gallery-picture-box:hover .image-info-overlay {
+  opacity: 1;
+}
+/* picture of the day */
 .pod-fullscreen-img {
   position: fixed;
   top: 0;
@@ -256,7 +355,6 @@ body {
 .display-none {
   display: none;
 }
-/* picture of the day */
 
 .pod-container {
   width: 100%;
@@ -268,9 +366,17 @@ body {
 .pod-left {
   width: 800px;
   padding: 0 50px;
+  opacity: 1;
+  position: relative;
+  left: 0;
+  transition: ease-in-out 0.8s;
 }
 .pod-right {
   padding: 0 50px;
+  opacity: 1;
+  position: relative;
+  right: 0;
+  transition: ease-in-out 0.8s;
 }
 .pod-img {
   width: 400px;
@@ -304,6 +410,7 @@ body {
 .footer-left h2 {
   font-size: 24px;
   margin-bottom: 8px;
+  font-family: 'Orbitron', sans-serif;
 }
 
 .footer-left p {
@@ -346,4 +453,8 @@ body {
 .hide-top-100 {
   top: -100px;
   opacity: 0;
+}
+.hide-top-60 {
+  top: -60px;
+  /* opacity: 0; */
 }

@@ -7,12 +7,14 @@ import Weather from './components/Weather.tsx';
 import MarsGallery from './components/MarsGallery.tsx';
 import PictureOfTheDay from './components/PictureOfTheDay.tsx';
 import SecondTextSection from './components/SecondTextSection.tsx';
+import ThirdTextSection from './components/ThirdTextSection.tsx';
 import Footer from './components/Footer.tsx';
 import {
   usePodData,
   useRandomPics,
   useComparisonData,
 } from './fetch/fetch.tsx';
+import Navbar from './components/Navbar.tsx';
 
 function App() {
   const [coords, setCoords] = useState({ lat: 40.7128, lon: -74.006 });
@@ -52,15 +54,17 @@ function App() {
     };
   }, []);
 
-  useEffect(() => {
-    console.log(RandomPics);
-  }, [RandomPics]);
+  // useEffect(() => {
+  //   console.log(RandomPics);
+  // }, [RandomPics]);
 
-  if (!podData || !comparisonData) return <div>Loading data...</div>;
+  if (!podData || !comparisonData || !RandomPics)
+    return <div>Loading data...</div>;
 
   return (
     <>
-      <h1 className='test-scrollTop'>{scrollTop}</h1>
+      {/* <h1 className='test-scrollTop'>{scrollTop}</h1> */}
+      <Navbar scrollTop={scrollTop} />
       <Hero />
       <div className={`mars-canvas-container ${scrollTop > 800 ? 'hide' : ''}`}>
         <MarsGlobe scrollTop={scrollTop} />
@@ -72,9 +76,10 @@ function App() {
         comparisonData={comparisonData}
         setCoords={setCoords}
       />
-      <MarsGallery scrollTop={scrollTop} />
       <SecondTextSection />
-      <PictureOfTheDay podData={podData} />
+      <MarsGallery scrollTop={scrollTop} RandomPics={RandomPics} />
+      <ThirdTextSection />
+      <PictureOfTheDay podData={podData} scrollTop={scrollTop} />
       <Footer />
     </>
   );
