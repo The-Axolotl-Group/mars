@@ -28,12 +28,32 @@ const apiRouter = (client: OpenAI) => {
   // https://api.nasa.gov/mars-photos/api/v1/rovers/curiosity/photos?sol=1000&api_key=4Ft01vTgsi4Gp07fqeIlcrjaGJ0AO3fz1KHQaL8m
   // https://api.nasa.gov/mars-photos/api/v1/rovers/curiosity/photos?earth_date=2024-6-6&api_key=4Ft01vTgsi4Gp07fqeIlcrjaGJ0AO3fz1KHQaL8m
   // "Random Pokemon Cards" -> Reset / ...
+  // router.get(
+  //   '/randomPics',
+  //   apiController.fetchRandomPics,
+  //   (req: Request, res: Response) => {
+  //     // console.log(res.locals.randomMarsPics);
+  //     res.status(200).json(res.locals.randomMarsPics);
+  //   }
+  // );
+
+  // LAZY LOADING - In progress
+  // req.query -> '/search?q=example'
+  // req.body -> '/users/:id'
   router.get(
-    '/randomPics',
+    '/randomPics/:page',
+    (req, res, next) => {
+      res.locals.pageNum = req.params.page || '1';
+      res.locals.limitNum = req.query.limit || '6';
+      next();
+    },
     apiController.fetchRandomPics,
-    (req: Request, res: Response) => {
-      console.log(res.locals.randomMarsPics);
-      res.status(200).json(res.locals.randomMarsPics);
+    (req, res) => {
+      res.status(200).json({
+        photos: res.locals.randomMarsPics,
+        page: req.query.page,
+        limit: req.query.limit,
+      });
     }
   );
 

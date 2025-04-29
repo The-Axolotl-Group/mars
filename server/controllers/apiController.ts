@@ -164,36 +164,63 @@ const apiController = {
     - 675, 676, 677, 678, 679, 680, 681
     */
 
-    const FINAL_URL = `${NASA_URL}&feedtype=json&ver=1.0`;
-    // console.log('### MARS URL ###');
-    // console.log(FINAL_URL);
-
     try {
+      if (!res.locals.weatherData) res.locals.weatherData = {};
+      res.locals.weatherData.mars = [];
+
+      // Check if we already have the data in the DB
+      // Sort from newest to oldest
+      const recentMarsData = await model.Mars.find().sort({ _id: -1 });
+      if (recentMarsData.length > 0) {
+        res.locals.weatherData.mars = recentMarsData;
+        return next();
+      }
+
+      const FINAL_URL = `${NASA_URL}&feedtype=json&ver=1.0`;
+      // console.log('### MARS URL ###');
+      // console.log(FINAL_URL);
+
       const response = await fetch(FINAL_URL);
       if (!response.ok) {
         throw new Error(`Response status: ${response.status}`);
       }
-      const data = await response.json();
-      const sols = data.sol_keys;
 
-      /* Fetch daata for each SOL
-      1/ Loop through each sol
-      2/ Look up the desired data for each sol
-      3/ Store the desired data for each sol
-      */
-      if (!res.locals.weatherData) res.locals.weatherData = {};
-      res.locals.weatherData.mars = [];
+      const data = await response.json();
+      if (!data.sol_keys || data.sol_keys.length === 0) {
+        throw new Error('No sol data available');
+      }
+
+      const sols = data.sol_keys;
 
       for (const sol of sols) {
         const solData = data[sol];
-        res.locals.weatherData.mars.push({
-          sol: sol,
-          temp_avg: `${solData.AT.av} °C`, // Degrees Celsius
-          temp_min: `${solData.AT.mn} °C`, // Degrees Celsius
-          temp_max: `${solData.AT.mx} °C`, // Degrees Celsius
-          pressure: `${solData.PRE.av} Pa`, // Pascals
-          wind_speed: `${solData.HWS.av} m/s`, // meters / sec
-        });
+        const solExist = await model.Mars.findOne({ sol: sol });
+
+        if (solExist) {
+          res.locals.weatherData.mars.push(solExist);
+        } else {
+          const newSol = new model.Mars({
+            sol: sol,
+            temp_avg: `${solData.AT.av} °C`, // Degrees Celsius
+            temp_min: `${solData.AT.mn} °C`, // Degrees Celsius
+            temp_max: `${solData.AT.mx} °C`, // Degrees Celsius
+            pressure: `${solData.PRE.av} Pa`, // Pascals
+            wind_speed: `${solData.HWS.av} m/s`, // meters / sec
+          });
+          await newSol.save();
+
+          res.locals.weatherData.mars.push(newSol);
+        }
+
+        // // Old implementation without DB lookup/storage
+        // res.locals.weatherData.mars.push({
+        //   sol: sol,
+        //   temp_avg: `${solData.AT.av} °C`, // Degrees Celsius
+        //   temp_min: `${solData.AT.mn} °C`, // Degrees Celsius
+        //   temp_max: `${solData.AT.mx} °C`, // Degrees Celsius
+        //   pressure: `${solData.PRE.av} Pa`, // Pascals
+        //   wind_speed: `${solData.HWS.av} m/s`, // meters / sec
+        // });
       }
       // console.log('### MARS DATA ###');
       // console.log(res.locals.weatherData.mars);
@@ -222,12 +249,12 @@ const apiController = {
    */
 
       return next();
-    } catch (err) {
-      return next({
-        log: `fetchMarsData Error: ${err}`,
-        status: 500,
-        message: { error: 'An error occurred inside fetchMarsData' },
-      });
+    } catch (apiError) {
+      console.error('NASA API error:', apiError);
+      // Fallback to sample data
+      const sampleData = {}; // Implement logic for getting sample data
+      res.locals.weatherData.mars = sampleData;
+      return next();
     }
   },
 
@@ -281,7 +308,7 @@ const apiController = {
       res.locals.pod = data;
 
       // Save Picture of the Day (POD) to the DB
-      const photo = await model.Pod.find({ copyright: data.copyright });
+      const photo = await model.Pod.findOne({ copyright: data.copyright });
       if (photo) {
         res.locals.pod = photo;
       } else {
@@ -313,37 +340,90 @@ const apiController = {
     next: NextFunction
   ): Promise<void> => {
     try {
+      const page = parseInt(res.locals.pageNum) || 1;
+      const limit = parseInt(res.locals.limitNum) || 6;
+      const skip = (page - 1) * limit;
+
       const sol = 3996;
       const RANDOM_PICS_URL = `https://api.nasa.gov/mars-photos/api/v1/rovers/curiosity/photos?sol=${sol}&api_key=${NASA_API_KEY}`;
+
       const response = await fetch(RANDOM_PICS_URL);
       if (!response.ok) {
         throw new Error(`Response status: ${response.status}`);
       }
 
       const data = await response.json();
-      const photos = data.photos;
+
+      // <--- BATCH IMAGE PROCESS IMPLEMENTATION --->
+      const photos = data.photos.slice(skip, skip + limit); // Get photos with pagination
+      if (photos.length === 0) {
+        return next({
+          log: 'No photos available for requested page',
+          status: 404,
+          message: { error: 'No photos found for this page' },
+        });
+      }
+
+      // const photos = data.photos;
 
       if (!res.locals.randomMarsPics) res.locals.randomMarsPics = [];
 
-      // Define number of images you want to pass to the frontend
-      let numberOfPhotos: number = 99;
+      // 1. Define number of images you want to pass to the frontend
+      let numberOfPhotos: number = 6;
 
-      for (let i = 0; i < numberOfPhotos; i++) {
-        const currPhoto = photos[i];
-        const photo = await model.Photo.findOne({ nasa_id: currPhoto.id });
-        if (photo) {
-          res.locals.randomMarsPics.push(photo);
+      interface MarsPhoto {
+        id: number;
+        sol: number;
+        img_src: string;
+        earth_date: string;
+      }
+
+      // 2. Get photo ids only
+      const photoIds = photos.map((photo: MarsPhoto) => photo.id);
+
+      // 3. Instead of looping through the DB and making several calls, we're making a SINGLE QUERY
+      const existingPhotos = await model.Photo.find({
+        nasa_id: { $in: photoIds },
+      });
+
+      // 3. create a look up map
+      const existingPhotoMap: { [key: number]: any } = {};
+      for (const photo of existingPhotos) {
+        if (typeof photo.nasa_id === 'number') {
+          existingPhotoMap[photo.nasa_id] = photo;
+        }
+      }
+
+      const photosToSave = [];
+      for (const currPhoto of photos) {
+        // const currPhoto = photos[i];
+        // // const photo = await model.Photo.findOne({ nasa_id: currPhoto.id });
+
+        if (existingPhotoMap[currPhoto.id]) {
+          // res.locals.randomMarsPics.push(photo);
+          res.locals.randomMarsPics.push(existingPhotoMap[currPhoto.id]);
         } else {
-          const newPhoto = new model.Photo({
+          // const newPhoto = new model.Photo({
+          //   nasa_id: currPhoto.id,
+          //   sol: currPhoto.sol,
+          //   img_src: currPhoto.img_src,
+          //   earth_date: currPhoto.earth_date,
+          // });
+          // await newPhoto.save();
+          // res.locals.randomMarsPics.push(newPhoto);
+          const newPhoto = {
             nasa_id: currPhoto.id,
             sol: currPhoto.sol,
             img_src: currPhoto.img_src,
             earth_date: currPhoto.earth_date,
-          });
-          await newPhoto.save();
-
+          };
+          photosToSave.push(newPhoto);
           res.locals.randomMarsPics.push(newPhoto);
         }
+      }
+
+      if (photosToSave.length > 0) {
+        await model.Photo.insertMany(photosToSave);
       }
 
       // console.log(res.locals.randomMarsPics);
@@ -366,7 +446,7 @@ const apiController = {
     try {
       const prompt = req.body.prompt;
       const response = await promptOpenAI(prompt, client);
-      console.log(response);
+      // console.log(response);
       res.locals.response = response;
 
       // Save message to the DB
