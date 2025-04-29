@@ -4,7 +4,6 @@ type NavbarType = {
 };
 
 const Navbar = ({ scrollTop }: NavbarType) => {
-  console.log(scrollTop);
   return (
     <nav className={`navbar ${scrollTop < 800 ? 'hide-top-60' : ''}`}>
       <div className='navbar-content'>

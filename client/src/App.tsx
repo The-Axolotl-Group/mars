@@ -9,6 +9,7 @@ import PictureOfTheDay from './components/PictureOfTheDay.tsx';
 import SecondTextSection from './components/SecondTextSection.tsx';
 import ThirdTextSection from './components/ThirdTextSection.tsx';
 import Footer from './components/Footer.tsx';
+import Chat from './components/Chat.tsx';
 import {
   usePodData,
   useRandomPics,
@@ -22,6 +23,11 @@ function App() {
   const { podData } = usePodData();
   const { RandomPics } = useRandomPics();
   const { comparisonData } = useComparisonData(coords.lat, coords.lon);
+
+  const [isChatVisible, setChatVisible] = useState(false);
+  const toggleChatbox = () => {
+    setChatVisible((prevState) => !prevState);
+  };
   // this useEffect make scroll down smooth
   useEffect(() => {
     const lenis = new Lenis({
@@ -81,6 +87,16 @@ function App() {
       <ThirdTextSection />
       <PictureOfTheDay podData={podData} scrollTop={scrollTop} />
       <Footer />
+      <div>
+        {!isChatVisible && (
+          <button className='openChatBox' onClick={toggleChatbox}>
+            🛸Alien Transmission🛸
+          </button>
+        )}
+        {isChatVisible && (
+          <Chat isVisible={isChatVisible} toggleChatbox={toggleChatbox} />
+        )}
+      </div>
     </>
   );
 }
