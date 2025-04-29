@@ -436,6 +436,214 @@ body {
   opacity: 0.6;
   text-align: center;
 }
+
+/* chat box */
+.logo {
+  height: 6em;
+  padding: 1.5em;
+  will-change: filter;
+  transition: filter 300ms;
+}
+.logo:hover {
+  filter: drop-shadow(0 0 2em #646cffaa);
+}
+.logo.react:hover {
+  filter: drop-shadow(0 0 2em #61dafbaa);
+}
+
+@keyframes logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  a:nth-of-type(2) .logo {
+    animation: logo-spin infinite 20s linear;
+  }
+}
+
+.card {
+  padding: 2em;
+}
+
+.read-the-docs {
+  color: #888;
+}
+@import url('https://fonts.googleapis.com/css2?family=Martian+Mono:wght@100..800&display=swap');
+
+.chat {
+  position: fixed;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+  max-height: 500px;
+  min-height: 500px;
+  max-width: 300px;
+  min-width: 300px;
+
+  border: 1px solid rgb(255, 255, 255);
+  background-color: rgb(0, 0, 0);
+  opacity: 80%;
+  font-family: 'Martian Mono', monospace;
+  bottom: 2rem;
+  right: 2rem;
+
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  z-index: 999;
+
+  color: white;
+}
+
+.header {
+  margin: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 60px;
+  font-family: 'Martian Mono', monospace;
+  font-weight: Light;
+  font-size: 1.3rem;
+  opacity: 80%;
+  color: white;
+  background-color: rgb(0, 0, 0);
+  padding: 0;
+  /* border: 1px solid #fff; */
+}
+
+.closeButton {
+  position: absolute;
+  top: 8px;
+  right: 2px;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.openChatBox {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  position: absolute;
+  bottom: 1rem;
+  right: 1rem;
+  position: fixed;
+  padding: 8px 12px;
+  font-size: 1rem;
+  background-color: #2b2b2b;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: 'Martian Mono', monospace;
+}
+
+.openChatBox:hover {
+  opacity: 1;
+  box-shadow: 0 0 10px rgb(255, 255, 255), 0 0 20px rgb(255, 255, 255);
+}
+
+.closeButton:hover {
+  box-shadow: 0 0 10px rgb(255, 255, 255), 0 0 20px rgb(255, 255, 255);
+}
+
+.messages {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  background-color: white;
+  overflow: hidden;
+  overflow-y: auto;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE 10+ */
+
+  /* font-family: 'Martian Mono', monospace; */
+  font-size: 13px;
+
+  height: 390px;
+  width: 300px;
+  /* border: 1px solid #fff; */
+}
+
+.message-earth {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  padding: 8px;
+  border-radius: 20px;
+  margin: 4px;
+  max-width: 250px;
+  background-color: rgb(33, 114, 186);
+}
+
+.message-mars {
+  align-self: flex-start;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  max-width: 250px;
+  padding: 8px;
+  border-radius: 20px;
+  margin: 4px;
+  background-color: rgb(137, 35, 35);
+}
+
+.input-and-send-button {
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.input {
+  height: 38px;
+  width: 246px;
+
+  border: none;
+  border-radius: 5px;
+
+  font-family: 'Martian Mono', monospace;
+  margin-top: 1px;
+  margin-bottom: 3px;
+  margin-left: 3px;
+}
+
+.send-icon {
+  height: 40px;
+  width: 40px;
+
+  margin-bottom: 3px;
+  margin-right: 3px;
+
+  border-radius: 5px;
+
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.send-icon:hover {
+  box-shadow: 0 0 10px rgb(255, 255, 255), 0 0 20px rgb(255, 255, 255);
+}
+
+.input:hover {
+  box-shadow: 0 0 10px rgb(255, 255, 255), 0 0 20px rgb(255, 255, 255);
+}
+
+/* animation css class */
 .hide-left-300 {
   left: -300px;
 }
