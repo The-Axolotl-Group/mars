@@ -1,6 +1,6 @@
 import React, { useEffect, useState /* useChat */ } from 'react';
 // import './Chat.css';
-import myImage from '/send-icon.png';
+import myImage from '../../public/send-icon.png';
 
 interface ChatProps {
   isVisible: boolean;
@@ -12,7 +12,7 @@ const Chat: React.FC<ChatProps> = ({ isVisible, toggleChatbox }: ChatProps) => {
 
   const [input, setInput] = useState<string>('');
   const [allMessages, setAllMessages] = useState<string[]>([]);
-  const [prompt, setPrompt] = useState('');
+  // const [prompt, setPrompt] = useState('');
 
   // const  { marsMessage, marsMessageError } = useChat(prompt)
 
