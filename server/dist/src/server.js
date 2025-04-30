@@ -8,14 +8,17 @@ const express_1 = __importDefault(require("express"));
 const path_1 = __importDefault(require("path"));
 const api_1 = __importDefault(require("../routes/api"));
 const cors_1 = __importDefault(require("cors"));
+const openai_1 = __importDefault(require("openai"));
 dotenv_1.default.config();
 const PORT = process.env.PORT || 3000;
 const app = (0, express_1.default)();
+// OpenAI auth: https://github.com/openai/openai-node
+const client = new openai_1.default({ apiKey: process.env['OPENAI_KEY'] });
 app.use(express_1.default.json());
-app.use(express_1.default.urlencoded());
+app.use(express_1.default.urlencoded({ extended: true }));
 app.use((0, cors_1.default)());
 app.use(express_1.default.static(path_1.default.resolve(__dirname, '../client')));
-app.use('/api', api_1.default);
+app.use('/api', (0, api_1.default)(client));
 app.get('/', (req, res) => {
     res.status(200).send('API is working...');
 });

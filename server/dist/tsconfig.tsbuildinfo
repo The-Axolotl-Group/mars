@@ -1,1 +1,1 @@
-{"root":["../controllers/apicontroller.ts","../routes/api.ts","../src/server.ts"],"version":"5.8.3"}
+{"root":["../controllers/apicontroller.ts","../models/apimodels.ts","../routes/api.ts","../src/server.ts"],"version":"5.8.3"}
