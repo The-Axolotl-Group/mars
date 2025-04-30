@@ -338,12 +338,14 @@ const apiController = {
     client: OpenAI
   ): Promise<void> => {
     try {
-      const prompt = req.body.prompt;
+      const prompt = req.body.message;
+      // console.log('Prompt sent to OpenAI:', prompt); // Log the prompt
       const response = await promptOpenAI(prompt, client);
-      console.log(response);
+      // console.log('OpenAI response:', response); // Log the OpenAI response
       res.locals.response = response;
       return next();
     } catch (err) {
+      // console.error('Error in getResponse:', err); // Log the error
       return next({
         log: `getResponse data Error: ${err}`,
         status: 500,
@@ -351,6 +353,8 @@ const apiController = {
       });
     }
   },
+
+  
 };
 
 export default apiController;

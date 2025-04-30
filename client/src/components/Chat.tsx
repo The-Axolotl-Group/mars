@@ -1,5 +1,4 @@
-import React, { useEffect, useState /* useChat */ } from 'react';
-// import './Chat.css';
+import React, { useEffect, useState, useRef } from 'react';
 import myImage from '../../public/send-icon.png';
 
 interface ChatProps {
@@ -8,32 +7,48 @@ interface ChatProps {
 }
 
 const Chat: React.FC<ChatProps> = ({ isVisible, toggleChatbox }: ChatProps) => {
-  // create a useState to get input, save messages
-
   const [input, setInput] = useState<string>('');
   const [allMessages, setAllMessages] = useState<string[]>([]);
-  // const [prompt, setPrompt] = useState('');
 
-  // const  { marsMessage, marsMessageError } = useChat(prompt)
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // useEffect(() => {
-  //   if (marsMessage) setAllMessages((prev) => [...prev, marsMessage]);
-  // }, [marsMessage]);
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [allMessages]);
 
-  const handleClick = () => {
+  const handleClick = async () => {
     if (input.trim() === '') return;
 
-    setAllMessages((prevMessages) => [...prevMessages, input]);
-    // setPrompt(input);
+    const userMessage = input;
+    setAllMessages((prevMessages) => [...prevMessages, userMessage]);
     setInput('');
+
+    try {
+      const martianResponse = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: userMessage }),
+      });
+
+      if (!martianResponse.ok) {
+        throw new Error('Stop trying to make Fetch on Martian Message happen!');
+      }
+
+      const data = await martianResponse.json();
+
+      setAllMessages((prevMessages) => [...prevMessages, data.response]);
+    } catch (error) {
+      console.error('Error talking to Martian', error);
+      setAllMessages((prevMessages) => [
+        ...prevMessages,
+        '👽... no response...',
+      ]);
+    }
   };
 
   return (
     <div className={`chat ${isVisible ? 'visible' : ''}`}>
       <header>
-        {/* <button onClick={toggleChatbox} className="closeButton">
-                    X
-                </button>   */}
         <div className='header'>
           Chat with Martians{' '}
           <span onClick={toggleChatbox} className='closeButton'>
@@ -42,15 +57,13 @@ const Chat: React.FC<ChatProps> = ({ isVisible, toggleChatbox }: ChatProps) => {
         </div>
       </header>
 
-      <main className='messages'>
-        {allMessages.map((message, i) => (
-          <div
-            key={i}
-            className={i % 2 === 0 ? 'message-earth' : 'message-mars'}
-          >
-            {message}
+      <main className="messages">
+        {allMessages.map((msg, i) => (
+          <div key={i} className={i % 2 === 0 ? 'message-earth' : 'message-mars'}>
+            {msg}
           </div>
         ))}
+        <div ref={messagesEndRef} />
       </main>
 
       <div className='input-and-send-button'>
