@@ -45,11 +45,11 @@ const PictureOfTheDay = ({
           onClick={() => handleBigImg()}
           className='pod-img'
           src={url}
-          alt=''
+          alt='1st test image'
         />
       </div>
       <div className={`pod-fullscreen-img ${showBigImg ? '' : 'display-none'}`}>
-        <img src={hdurl} alt='' />
+        <img src={hdurl} alt='2nd test image' />
         <button className='big-img-btn' onClick={() => handleBigImg()}>
           X
         </button>
