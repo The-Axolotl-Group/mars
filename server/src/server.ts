@@ -6,6 +6,9 @@ import cors from 'cors';
 import OpenAI from 'openai';
 
 dotenv.config();
+// Load .env.test explicitly
+dotenv.config({ path: path.resolve(__dirname, '../.env.test') });
+
 
 const PORT = process.env.PORT || 3000;
 const app = express();
@@ -36,6 +39,12 @@ const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
 };
 app.use(errorHandler);
 
-app.listen(PORT, () => {
-  console.log(`Listening to port: ${PORT}`);
-});
+// app.listen(PORT, () => {
+//   console.log(`Listening to port: ${PORT}`);
+// });
+
+if (process.env.NODE_ENV !== 'test') {
+  app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+}
+
+export default app;
