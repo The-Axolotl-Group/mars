@@ -32,7 +32,7 @@ const apiRouter = (client: OpenAI) => {
     '/randomPics',
     apiController.fetchRandomPics,
     (req: Request, res: Response) => {
-      console.log(res.locals.randomMarsPics);
+      // console.log(res.locals.randomMarsPics);
       res.status(200).json(res.locals.randomMarsPics);
     }
   );
