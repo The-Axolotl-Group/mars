@@ -488,7 +488,7 @@ body {
 
   border: 1px solid rgb(255, 255, 255);
   background-color: rgb(0, 0, 0);
-  opacity: 80%;
+  opacity: 90%;
   font-family: 'Martian Mono', monospace;
   bottom: 2rem;
   right: 2rem;
@@ -562,8 +562,8 @@ body {
   background-color: white;
   overflow: hidden;
   overflow-y: auto;
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* IE 10+ */
+  scrollbar-width: thin; /* Firefox */
+  -ms-overflow-style: auto; /* IE 10+ */
 
   /* font-family: 'Martian Mono', monospace; */
   font-size: 13px;
@@ -571,6 +571,23 @@ body {
   height: 390px;
   width: 300px;
   /* border: 1px solid #fff; */
+}
+
+.messages::-webkit-scrollbar {
+  width: 8px;
+}
+
+.messages::-webkit-scrollbar-thumb {
+  background-color: #888;
+  border-radius: 4px;
+}
+
+.messages::-webkit-scrollbar-thumb:hover {
+  background-color: #555;
+}
+
+.messages::-webkit-scrollbar-track {
+  background-color: #f1f1f1;
 }
 
 .message-earth {

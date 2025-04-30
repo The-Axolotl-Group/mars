@@ -39,13 +39,16 @@ const apiRouter = (client: OpenAI) => {
 
   // // 4. TODO: Make an OpenAI API call to talk to the Martian
   // Save the data to the DB
+
   router.post(
     '/chat',
     (req: Request, res: Response, next: NextFunction) => {
+      // console.log('Incoming request to /chat:', req.body); // Log the incoming request
       apiController.getResponse(req, res, next, client);
     },
     (req: Request, res: Response) => {
-      res.status(200).json(res.locals.response);
+      // console.log('Response to be sent:', res.locals.response); // Log the response
+      res.status(200).json({ response: res.locals.response });
     }
   );
 
